@@ -7,12 +7,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.LinkedList;
-
 public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private LinkedList<String> expression = new LinkedList<String>();
+    private Calculator calculator = new Calculon();
 
     private TextView text;
     private String error;
@@ -31,13 +29,7 @@ public class MainActivity extends Activity {
 
         Log.d(TAG, "Append digit: " + digit);
 
-        if (isOperand(expression.peekLast())){
-            String value = expression.pollLast();
-            expression.addLast(value + digit);
-        }
-        else {
-            expression.addLast(digit);
-        }
+        calculator.appendDigit(digit);
 
         update();
     }
@@ -47,13 +39,7 @@ public class MainActivity extends Activity {
 
         Log.d(TAG, "Append radix: " + radix);
 
-        if (isOperand(expression.peekLast())){
-            String value = expression.pollLast();
-            expression.addLast(value + radix);
-        }
-        else {
-            expression.addLast("0" + radix);
-        }
+        calculator.appendRadix(radix);
 
         update();
     }
@@ -63,7 +49,7 @@ public class MainActivity extends Activity {
 
         Log.d(TAG, "Append operator: " + operator);
 
-        expression.add(operator);
+        calculator.appendOperator(operator);
 
         update();
     }
@@ -71,7 +57,7 @@ public class MainActivity extends Activity {
     public void clear(View view) {
         Log.d(TAG, "Clear");
 
-        expression.clear();
+        calculator.clear();
 
         update();
     }
@@ -79,16 +65,7 @@ public class MainActivity extends Activity {
     public void remove(View view) {
         Log.d(TAG, "Remove");
 
-        if (isOperand(expression.peekLast())){
-            String value = expression.pollLast();
-
-            if(!value.isEmpty()) {
-                expression.addLast(value.substring(0, value.length() - 1));
-            }
-        }
-        else {
-            expression.pollLast();
-        }
+        calculator.remove();
 
         update();
     }
@@ -96,92 +73,22 @@ public class MainActivity extends Activity {
     public void calculate(View view) {
         Log.d(TAG, "Calculate");
 
-        while(expression.size() > 1) {
-            double result = 0, a = 0, b = 0;
-            String operator = null;
+        try {
+            calculator.calculate();
 
-            if(isOperand(expression.peek())) a = toDouble(expression.pop());
-            if(isOperator(expression.peek())) operator = expression.pop();
-            if(isOperand(expression.peek())) b = toDouble(expression.pop());
+            update();
+        } catch (Exception e) {
+            Log.w(TAG, "Calculate failed.", e);
 
-            if(operator == null) break;
-
-            if (operator.equals("+")) result = add(a, b);
-            else if (operator.equals("-")) result = subtract(a, b);
-            else if (operator.equals("*")) result = multiply(a, b);
-            else if (operator.equals("/")) result = divide(a, b);
-
-            expression.addFirst(toString(result));
-        }
-
-        if(isError(expression.peek())) {
-            Log.d(TAG, "Error");
-
-            expression.clear();
             update(error);
-            return;
         }
-
-        update();
     }
 
     private void update() {
-        StringBuilder sb = new StringBuilder();
-
-        for (String value : expression) {
-            sb.append(value);
-        }
-
-        text.setText(sb.toString());
+        text.setText(calculator.toString());
     }
 
     private void update(String value) {
         text.setText(value);
-    }
-
-    private double add(double a, double b) {
-        return a + b;
-    }
-
-    private double subtract(double a, double b) {
-        return a - b;
-    }
-
-    private double multiply(double a, double b) {
-        return a * b;
-    }
-
-    private double divide(double a, double b) {
-        return a / b;
-    }
-
-    private boolean isOperator(String value) {
-        if(value == null) return false;
-
-        return value.equals("+") || value.equals("-") || value.equals("*") || value.equals("/");
-    }
-
-    private boolean isOperand(String value) {
-        if(value == null) return false;
-
-        return !isOperator(value);
-    }
-
-    private double toDouble(String value) {
-        return Double.parseDouble(value);
-    }
-
-    private String toString(double value) {
-        return Double.toString(value);
-    }
-
-    private boolean isError(String value) {
-        if(value == null) return false;
-
-        return isError(toDouble(value));
-    }
-
-    private boolean isError(double value) {
-        return Double.isNaN(value);
     }
 }
