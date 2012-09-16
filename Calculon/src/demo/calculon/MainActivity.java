@@ -130,7 +130,6 @@ public class MainActivity extends Activity {
 
         for (String value : expression) {
             sb.append(value);
-            sb.append(" ");
         }
 
         text.setText(sb.toString());
