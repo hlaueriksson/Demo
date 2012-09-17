@@ -1,27 +1,28 @@
 package demo.calculon;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import com.google.inject.Inject;
+import roboguice.activity.RoboActivity;
+import roboguice.inject.ContentView;
+import roboguice.inject.InjectResource;
+import roboguice.inject.InjectView;
 
-public class MainActivity extends Activity {
+@ContentView(R.layout.main)
+public class MainActivity extends RoboActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private Calculator calculator = new Calculon();
+    @Inject Calculator calculator;
 
-    private TextView text;
-    private String error;
+    @InjectView(R.id.text) TextView text;
+    @InjectResource(R.string.error) String error;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-
-        text = (TextView) findViewById(R.id.text);
-        error = getString(R.string.error);
     }
 
     public void appendDigit(View view) {

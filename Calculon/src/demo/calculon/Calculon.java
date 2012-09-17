@@ -1,11 +1,20 @@
 package demo.calculon;
 
+import com.google.inject.Inject;
+
 import java.util.LinkedList;
 
 /* Hi, I am Antonio Calculon, Sr! */
 public class Calculon implements Calculator {
 
     private LinkedList<String> expression = new LinkedList<String>();
+
+    private final Logger logger;
+
+    @Inject
+    public Calculon(Logger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public void appendDigit(String digit) {
@@ -74,7 +83,7 @@ public class Calculon implements Calculator {
         }
 
         if(isError(expression.peek())) {
-            //Log.d(TAG, "Error");
+            logger.debug("Error");
 
             expression.clear();
 
