@@ -28,3 +28,7 @@ local.properties
 *.iws
 .idea/
 out/
+
+# ProGuard log files
+
+proguard_logs/
